@@ -82,7 +82,7 @@ class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .lightGray
+        view.backgroundColor = .white
 
         setupView()
         addConstraintsForItems()
@@ -109,22 +109,27 @@ class ViewController: UIViewController {
 
         NSLayoutConstraint.activate([borderViewTopConstraint, borderViewLeftConstraint, borderViewRightConstraint, borderViewBottomConstraint])
 
-        rotateButtonBottomAnchorConstraint = rotateButton.centerYAnchor.constraint(equalTo: imageView.centerYAnchor, constant: -20)
-        rotateButtonTrailingAnchorConstraint = rotateButton.trailingAnchor.constraint(equalTo: imageView.trailingAnchor, constant: 40)
+        let buttonStackView = UIStackView()
+        buttonStackView.addArrangedSubview(rotateButton)
+        buttonStackView.addArrangedSubview(deleteButton)
+        buttonStackView.axis = .vertical
+        buttonStackView.spacing = 20
+        buttonStackView.distribution = .fillEqually
+        view.addSubview(buttonStackView)
 
-        NSLayoutConstraint.activate([rotateButtonBottomAnchorConstraint, rotateButtonTrailingAnchorConstraint])
+        buttonStackView.translatesAutoresizingMaskIntoConstraints = false
+        let trailingStackViewConstraint = buttonStackView.trailingAnchor.constraint(equalTo: imageView.trailingAnchor, constant: 40)
+        let centerYStackViewConstraint = buttonStackView.centerYAnchor.constraint(equalTo: imageView.centerYAnchor)
+        let stackViewWidthConstraint = buttonStackView.widthAnchor.constraint(equalToConstant: 50)
+        let stackViewHeightConstraint = buttonStackView.heightAnchor.constraint(equalToConstant: 100)
 
-        deleteButtonTopAnchorConstraint = deleteButton.centerYAnchor.constraint(equalTo: imageView.centerYAnchor, constant: 20)
-        deleteButtonTrailingAnchorConstraint = deleteButton.trailingAnchor.constraint(equalTo: imageView.trailingAnchor, constant: 40)
-
-        NSLayoutConstraint.activate([deleteButtonTopAnchorConstraint, deleteButtonTrailingAnchorConstraint])
+        NSLayoutConstraint.activate([trailingStackViewConstraint, centerYStackViewConstraint, stackViewWidthConstraint, stackViewHeightConstraint])
     }
 
     private func setupView() {
         view.addSubview(imageView)
         view.addSubview(rotateButton)
         view.addSubview(deleteButton)
-
         imageView.addSubview(borderView)
     }
 
@@ -211,7 +216,6 @@ class ViewController: UIViewController {
             $0.heightAnchor.constraint(equalTo: $0.widthAnchor).isActive = true
             $0.isHidden = true
             imageView.addSubview($0)
-
         }
 
         NSLayoutConstraint.activate([
@@ -247,7 +251,7 @@ class ViewController: UIViewController {
             bottomLeftCircleView.isHidden = true
             bottomRightCircleView.isHidden = false
             bottomRightCircleView.shapeLayer.lineWidth = 80
-            bottomRightCircleView.shapeLayer.opacity = 0.4
+            bottomRightCircleView.shapeLayer.opacity = 0.6
         case (imageView.frame.minX-proxyFactor...imageView.frame.minX+proxyFactor, imageView.frame.maxY-proxyFactor...imageView.frame.maxY+proxyFactor):
             resizeRect.leftTouch = true
             resizeRect.bottomTouch = true
@@ -256,7 +260,7 @@ class ViewController: UIViewController {
             bottomLeftCircleView.isHidden = false
             bottomRightCircleView.isHidden = true
             bottomLeftCircleView.shapeLayer.lineWidth = 80
-            bottomLeftCircleView.shapeLayer.opacity = 0.4
+            bottomLeftCircleView.shapeLayer.opacity = 0.6
         case (imageView.frame.maxX-proxyFactor...imageView.frame.maxX+proxyFactor, imageView.frame.minY-proxyFactor...imageView.frame.minY+proxyFactor):
             resizeRect.rightTouch = true
             resizeRect.topTouch = true
@@ -265,7 +269,7 @@ class ViewController: UIViewController {
             bottomLeftCircleView.isHidden = true
             bottomRightCircleView.isHidden = true
             topRightCircleView.shapeLayer.lineWidth = 80
-            topRightCircleView.shapeLayer.opacity = 0.4
+            topRightCircleView.shapeLayer.opacity = 0.6
         case (imageView.frame.minX-proxyFactor...imageView.frame.minX+proxyFactor, imageView.frame.minY-proxyFactor...imageView.frame.minY+proxyFactor):
             resizeRect.leftTouch = true
             resizeRect.topTouch = true
@@ -274,7 +278,7 @@ class ViewController: UIViewController {
             bottomLeftCircleView.isHidden = true
             bottomRightCircleView.isHidden = true
             topLeftCircleView.shapeLayer.lineWidth = 80
-            topLeftCircleView.shapeLayer.opacity = 0.4
+            topLeftCircleView.shapeLayer.opacity = 0.6
         default:
             break
         }
