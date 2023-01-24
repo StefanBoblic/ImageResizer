@@ -15,7 +15,7 @@ class ViewController: UIViewController {
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.image = UIImage(contentsOfFile: bundlePath ?? "")
         imageView.isUserInteractionEnabled = true
-        imageView.contentMode = .scaleToFill
+        imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = false
         return imageView
     }()
@@ -44,12 +44,18 @@ class ViewController: UIViewController {
         return button
     }()
 
+    private var borderView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.layer.borderColor = UIColor.black.cgColor
+        view.layer.borderWidth = 0
+        return view
+    }()
+
     private var topLeftCircleView = CircleView()
     private var topRightCircleView = CircleView()
     private var bottomLeftCircleView = CircleView()
     private var bottomRightCircleView = CircleView()
-
-    private var borderView = UIView()
 
     private var imageViewTopConstraint: NSLayoutConstraint!
     private var imageViewBottomConstraint: NSLayoutConstraint!
@@ -68,12 +74,9 @@ class ViewController: UIViewController {
         }
     }
 
-    private var originalImageFrame: CGRect = .zero
     private var resizeRect = ResizeRect()
     private var proxyFactor: CGFloat = 10.0
-
     private var rotationGesture: UIRotationGestureRecognizer!
-
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -120,11 +123,7 @@ class ViewController: UIViewController {
         view.addSubview(rotateButton)
         view.addSubview(deleteButton)
 
-        borderView.translatesAutoresizingMaskIntoConstraints = false
         imageView.addSubview(borderView)
-
-        borderView.layer.borderColor = UIColor.black.cgColor
-        borderView.layer.borderWidth = 0
     }
 
     private func addRotationGesture() {
@@ -147,11 +146,10 @@ class ViewController: UIViewController {
         if gestureRecognizer.state == .began {
             isResizing = false
         }
-        if let view = gestureRecognizer.view {
-            view.transform = view.transform.rotated(by: gestureRecognizer.rotation)
-            gestureRecognizer.rotation = 0
-        }
-        if  gestureRecognizer.state == .ended {
+        guard let view = gestureRecognizer.view else { return }
+        view.transform = view.transform.rotated(by: gestureRecognizer.rotation)
+        gestureRecognizer.rotation = 0
+        if gestureRecognizer.state == .ended {
             isResizing = true
         }
     }
@@ -162,7 +160,6 @@ class ViewController: UIViewController {
 
     @objc private func handleDeleteImage() {
         let alert = UIAlertController(title: "Delete image?", message: "Are you sure you want to delete this image?", preferredStyle: .alert)
-
         let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
 
         let deleteAction = UIAlertAction(title: "Delete", style: .destructive) { [weak self] _ in
@@ -228,61 +225,56 @@ class ViewController: UIViewController {
     }
 
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        if !isResizing { return() }
-
-        if let touch = touches.first{
-
-            let touchStart = touch.location(in: self.view)
-
-            resizeRect.topTouch = false
-            resizeRect.leftTouch = false
-            resizeRect.rightTouch = false
-            resizeRect.bottomTouch = false
-
-            if touchStart.y > imageView.frame.maxY - proxyFactor &&  touchStart.y < imageView.frame.maxY + proxyFactor {
-                resizeRect.bottomTouch = true
-            }
-
-            if touchStart.x > imageView.frame.maxX - proxyFactor && touchStart.x < imageView.frame.maxX + proxyFactor {
-                resizeRect.rightTouch = true
-            }
-
-            if touchStart.x > imageView.frame.minX - proxyFactor &&  touchStart.x < imageView.frame.minX + proxyFactor {
-                resizeRect.leftTouch = true
-            }
-
-            if touchStart.y > imageView.frame.minY - proxyFactor &&  touchStart.y < imageView.frame.minY + proxyFactor {
-                resizeRect.topTouch = true
-            }
+        guard isResizing else { return }
+        guard let touch = touches.first else { return }
+        let touchStart = touch.location(in: self.view)
+        resizeRect.topTouch = false
+        resizeRect.leftTouch = false
+        resizeRect.rightTouch = false
+        resizeRect.bottomTouch = false
+        switch (touchStart.x, touchStart.y) {
+        case (imageView.frame.maxX-proxyFactor...imageView.frame.maxX+proxyFactor, imageView.frame.maxY-proxyFactor...imageView.frame.maxY+proxyFactor):
+            resizeRect.rightTouch = true
+            resizeRect.bottomTouch = true
+        case (imageView.frame.minX-proxyFactor...imageView.frame.minX+proxyFactor, imageView.frame.maxY-proxyFactor...imageView.frame.maxY+proxyFactor):
+            resizeRect.leftTouch = true
+            resizeRect.bottomTouch = true
+        case (imageView.frame.maxX-proxyFactor...imageView.frame.maxX+proxyFactor, imageView.frame.minY-proxyFactor...imageView.frame.minY+proxyFactor):
+            resizeRect.rightTouch = true
+            resizeRect.topTouch = true
+        case (imageView.frame.minX-proxyFactor...imageView.frame.minX+proxyFactor, imageView.frame.minY-proxyFactor...imageView.frame.minY+proxyFactor):
+            resizeRect.leftTouch = true
+            resizeRect.topTouch = true
+        default:
+            break
         }
     }
 
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-        if !isResizing { return() }
+        guard isResizing else { return }
 
-        if let touch = touches.first{
-            let currentTouchPoint = touch.location(in: self.view)
-            let previousTouchPoint = touch.previousLocation(in: self.view)
+        guard let touch = touches.first else { return }
+        let currentTouchPoint = touch.location(in: self.view)
+        let previousTouchPoint = touch.previousLocation(in: self.view)
 
-            let deltaX = currentTouchPoint.x - previousTouchPoint.x
-            let deltaY = currentTouchPoint.y - previousTouchPoint.y
+        let deltaX = currentTouchPoint.x - previousTouchPoint.x
+        let deltaY = currentTouchPoint.y - previousTouchPoint.y
 
-            if resizeRect.topTouch && resizeRect.leftTouch {
-                imageViewTopConstraint.constant += deltaY
-                imageViewLeftConstraint.constant += deltaX
-            }
-            if resizeRect.topTouch && resizeRect.rightTouch {
-                imageViewTopConstraint.constant += deltaY
-                imageViewRightConstraint.constant -= deltaX
-            }
-            if resizeRect.bottomTouch && resizeRect.leftTouch {
-                imageViewBottomConstraint.constant -= deltaY
-                imageViewLeftConstraint.constant += deltaX
-            }
-            if resizeRect.bottomTouch && resizeRect.rightTouch {
-                imageViewBottomConstraint.constant -= deltaY
-                imageViewRightConstraint.constant -= deltaX
-            }
+        switch (resizeRect.topTouch, resizeRect.leftTouch, resizeRect.rightTouch, resizeRect.bottomTouch) {
+        case (true, true, _, _):
+            imageViewTopConstraint.constant += deltaY
+            imageViewLeftConstraint.constant += deltaX
+        case (true, _, true, _):
+            imageViewTopConstraint.constant += deltaY
+            imageViewRightConstraint.constant -= deltaX
+        case (_, true, _, true):
+            imageViewBottomConstraint.constant -= deltaY
+            imageViewLeftConstraint.constant += deltaX
+        case (_, _, true, true):
+            imageViewBottomConstraint.constant -= deltaY
+            imageViewRightConstraint.constant -= deltaX
+        default:
+            break
         }
     }
 }
