@@ -15,7 +15,7 @@ class ViewController: UIViewController {
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.image = UIImage(contentsOfFile: bundlePath ?? "")
         imageView.isUserInteractionEnabled = true
-        imageView.contentMode = .scaleAspectFill
+        imageView.contentMode = .scaleToFill
         imageView.clipsToBounds = false
         return imageView
     }()
@@ -44,10 +44,10 @@ class ViewController: UIViewController {
         return button
     }()
 
-    private var borderView: UIView = {
+    private let borderView: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
-        view.layer.borderColor = UIColor.black.cgColor
+        view.layer.borderColor = UIColor.white.cgColor
         view.layer.borderWidth = 0
         return view
     }()
@@ -61,6 +61,8 @@ class ViewController: UIViewController {
     private var imageViewBottomConstraint: NSLayoutConstraint!
     private var imageViewLeftConstraint: NSLayoutConstraint!
     private var imageViewRightConstraint: NSLayoutConstraint!
+    private var imageViewWidthConstraint: NSLayoutConstraint!
+    private var imageViewHeightConstraint: NSLayoutConstraint!
 
     private var rotateButtonBottomAnchorConstraint: NSLayoutConstraint!
     private var rotateButtonTrailingAnchorConstraint: NSLayoutConstraint!
@@ -80,7 +82,7 @@ class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .white
+        view.backgroundColor = .lightGray
 
         setupView()
         addConstraintsForItems()
@@ -93,12 +95,12 @@ class ViewController: UIViewController {
     }
 
     private func addConstraintsForItems() {
-        imageViewTopConstraint = imageView.topAnchor.constraint(equalTo: view.topAnchor, constant: 180)
-        imageViewBottomConstraint = view.bottomAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 180)
-        imageViewLeftConstraint = imageView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 60)
-        imageViewRightConstraint = view.trailingAnchor.constraint(equalTo: imageView.trailingAnchor, constant: 70)
+        let imageViewXAnchorConstraint = imageView.centerXAnchor.constraint(equalTo: view.centerXAnchor)
+        let imageViewYAnchorConstraint = imageView.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+        imageViewWidthConstraint = imageView.widthAnchor.constraint(equalToConstant: 120)
+        imageViewHeightConstraint = imageView.heightAnchor.constraint(equalToConstant: 320)
 
-        NSLayoutConstraint.activate([imageViewTopConstraint, imageViewBottomConstraint, imageViewLeftConstraint, imageViewRightConstraint])
+        NSLayoutConstraint.activate([imageViewWidthConstraint, imageViewHeightConstraint, imageViewXAnchorConstraint, imageViewYAnchorConstraint])
 
         let borderViewTopConstraint = borderView.topAnchor.constraint(equalTo: imageView.topAnchor)
         let borderViewLeftConstraint = borderView.leadingAnchor.constraint(equalTo: imageView.leadingAnchor)
@@ -135,9 +137,11 @@ class ViewController: UIViewController {
         if rotateButton.isSelected {
             imageView.removeGestureRecognizer(rotationGesture)
             rotationGesture.state = .possible
+            rotateButton.tintColor = .systemPink
             rotateButton.isSelected = false
         } else {
             imageView.addGestureRecognizer(rotationGesture)
+            rotateButton.tintColor = .systemBlue
             rotateButton.isSelected = true
         }
     }
@@ -203,10 +207,11 @@ class ViewController: UIViewController {
     private func createCircles() {
         [topLeftCircleView, topRightCircleView, bottomLeftCircleView, bottomRightCircleView].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
-            $0.widthAnchor.constraint(equalToConstant: 20.0).isActive = true
+            $0.widthAnchor.constraint(equalToConstant: 20).isActive = true
             $0.heightAnchor.constraint(equalTo: $0.widthAnchor).isActive = true
             $0.isHidden = true
             imageView.addSubview($0)
+
         }
 
         NSLayoutConstraint.activate([
@@ -232,19 +237,44 @@ class ViewController: UIViewController {
         resizeRect.leftTouch = false
         resizeRect.rightTouch = false
         resizeRect.bottomTouch = false
+
         switch (touchStart.x, touchStart.y) {
         case (imageView.frame.maxX-proxyFactor...imageView.frame.maxX+proxyFactor, imageView.frame.maxY-proxyFactor...imageView.frame.maxY+proxyFactor):
             resizeRect.rightTouch = true
             resizeRect.bottomTouch = true
+            topLeftCircleView.isHidden = true
+            topRightCircleView.isHidden = true
+            bottomLeftCircleView.isHidden = true
+            bottomRightCircleView.isHidden = false
+            bottomRightCircleView.shapeLayer.lineWidth = 80
+            bottomRightCircleView.shapeLayer.opacity = 0.4
         case (imageView.frame.minX-proxyFactor...imageView.frame.minX+proxyFactor, imageView.frame.maxY-proxyFactor...imageView.frame.maxY+proxyFactor):
             resizeRect.leftTouch = true
             resizeRect.bottomTouch = true
+            topLeftCircleView.isHidden = true
+            topRightCircleView.isHidden = true
+            bottomLeftCircleView.isHidden = false
+            bottomRightCircleView.isHidden = true
+            bottomLeftCircleView.shapeLayer.lineWidth = 80
+            bottomLeftCircleView.shapeLayer.opacity = 0.4
         case (imageView.frame.maxX-proxyFactor...imageView.frame.maxX+proxyFactor, imageView.frame.minY-proxyFactor...imageView.frame.minY+proxyFactor):
             resizeRect.rightTouch = true
             resizeRect.topTouch = true
+            topLeftCircleView.isHidden = true
+            topRightCircleView.isHidden = false
+            bottomLeftCircleView.isHidden = true
+            bottomRightCircleView.isHidden = true
+            topRightCircleView.shapeLayer.lineWidth = 80
+            topRightCircleView.shapeLayer.opacity = 0.4
         case (imageView.frame.minX-proxyFactor...imageView.frame.minX+proxyFactor, imageView.frame.minY-proxyFactor...imageView.frame.minY+proxyFactor):
             resizeRect.leftTouch = true
             resizeRect.topTouch = true
+            topLeftCircleView.isHidden = false
+            topRightCircleView.isHidden = true
+            bottomLeftCircleView.isHidden = true
+            bottomRightCircleView.isHidden = true
+            topLeftCircleView.shapeLayer.lineWidth = 80
+            topLeftCircleView.shapeLayer.opacity = 0.4
         default:
             break
         }
@@ -252,29 +282,49 @@ class ViewController: UIViewController {
 
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard isResizing else { return }
-
         guard let touch = touches.first else { return }
-        let currentTouchPoint = touch.location(in: self.view)
-        let previousTouchPoint = touch.previousLocation(in: self.view)
+        let location = touch.location(in: view)
+        let previousLocation = touch.previousLocation(in: view)
+        var widthDiff: CGFloat = .zero
+        if (resizeRect.topTouch && resizeRect.leftTouch) || (resizeRect.bottomTouch && resizeRect.leftTouch) {
+            widthDiff = previousLocation.x - location.x
+        } else if (resizeRect.topTouch && resizeRect.rightTouch) || (resizeRect.bottomTouch && resizeRect.rightTouch) {
+            widthDiff = location.x - previousLocation.x
+        }
+        let aspectRatio = imageView.bounds.width / imageView.bounds.height
+        let newWidth = imageView.bounds.width + widthDiff
+        let newHeight = newWidth / aspectRatio
+        let minWidth: CGFloat = 120
+        let maxWidth: CGFloat = 195
+        let minHeight: CGFloat = 320
+        let maxHeight: CGFloat = 520
 
-        let deltaX = currentTouchPoint.x - previousTouchPoint.x
-        let deltaY = currentTouchPoint.y - previousTouchPoint.y
+        let newWidthSize = max(minWidth, min(maxWidth, newWidth))
+        let newHeightSize = max(minHeight, min(maxHeight, newHeight))
 
         switch (resizeRect.topTouch, resizeRect.leftTouch, resizeRect.rightTouch, resizeRect.bottomTouch) {
         case (true, true, _, _):
-            imageViewTopConstraint.constant += deltaY
-            imageViewLeftConstraint.constant += deltaX
+            imageViewWidthConstraint.constant = newWidthSize
+            imageViewHeightConstraint.constant = newHeightSize
         case (true, _, true, _):
-            imageViewTopConstraint.constant += deltaY
-            imageViewRightConstraint.constant -= deltaX
+            imageViewWidthConstraint.constant = newWidthSize
+            imageViewHeightConstraint.constant = newHeightSize
         case (_, true, _, true):
-            imageViewBottomConstraint.constant -= deltaY
-            imageViewLeftConstraint.constant += deltaX
+            imageViewWidthConstraint.constant = newWidthSize
+            imageViewHeightConstraint.constant = newHeightSize
         case (_, _, true, true):
-            imageViewBottomConstraint.constant -= deltaY
-            imageViewRightConstraint.constant -= deltaX
+            imageViewWidthConstraint.constant = newWidthSize
+            imageViewHeightConstraint.constant = newHeightSize
         default:
             break
+        }
+    }
+
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        [topLeftCircleView, topRightCircleView, bottomLeftCircleView, bottomRightCircleView].forEach {
+            $0.isHidden = false
+            $0.shapeLayer.lineWidth = 6
+            $0.shapeLayer.opacity = 1
         }
     }
 }
