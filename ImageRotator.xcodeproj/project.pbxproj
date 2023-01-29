@@ -14,6 +14,7 @@
 		A435C50D297B2F2100A06F53 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A435C50B297B2F2100A06F53 /* LaunchScreen.storyboard */; };
 		A46BE0B5297C656D006CEA3E /* lockscreen.jpeg in Resources */ = {isa = PBXBuildFile; fileRef = A46BE0B4297C656D006CEA3E /* lockscreen.jpeg */; };
 		A49D9AD0297F3A1000F4F3E8 /* CircleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A49D9ACF297F3A1000F4F3E8 /* CircleView.swift */; };
+		A49EE25B2985BBCF003DBB3B /* ResizableImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = A49EE25A2985BBCF003DBB3B /* ResizableImage.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +27,7 @@
 		A435C50E297B2F2100A06F53 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A46BE0B4297C656D006CEA3E /* lockscreen.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = lockscreen.jpeg; sourceTree = "<group>"; };
 		A49D9ACF297F3A1000F4F3E8 /* CircleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleView.swift; sourceTree = "<group>"; };
+		A49EE25A2985BBCF003DBB3B /* ResizableImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResizableImage.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -62,6 +64,7 @@
 				A435C504297B2F2100A06F53 /* ImageResizingViewController.swift */,
 				A46BE0AF297C440D006CEA3E /* Application */,
 				A46BE0B0297C4423006CEA3E /* Resources */,
+				A49EE25A2985BBCF003DBB3B /* ResizableImage.swift */,
 			);
 			path = ImageRotator;
 			sourceTree = "<group>";
@@ -160,6 +163,7 @@
 				A49D9AD0297F3A1000F4F3E8 /* CircleView.swift in Sources */,
 				A435C505297B2F2100A06F53 /* ImageResizingViewController.swift in Sources */,
 				A435C501297B2F2100A06F53 /* AppDelegate.swift in Sources */,
+				A49EE25B2985BBCF003DBB3B /* ResizableImage.swift in Sources */,
 				A435C503297B2F2100A06F53 /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
