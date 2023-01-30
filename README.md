@@ -4,6 +4,6 @@ This is a small image-resizing app. It uses *UIPanGestureRecognizer*, *UITapGest
 
 I hope that someone finds this useful for inspiration :)
 
+![Simulator Screen Recording - iPhone 14 - 2023-01-30 at 15 07 17](https://user-images.githubusercontent.com/57292223/215487191-c908508e-f179-4e4a-95ff-5b9e739535a3.gif)
 
 
-![Simulator Screen Recording - iPhone 14 - 2023-01-29 at 18 43 18](https://user-images.githubusercontent.com/57292223/215340988-5dd32b38-8452-4152-8ccd-f3bd656f814d.gif)
