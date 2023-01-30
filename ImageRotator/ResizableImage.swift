@@ -7,7 +7,7 @@
 
 import UIKit
 
-class ResizableImage: UIView {
+class ResizableImage: UIImageView {
 
     private enum CornerType {
         case topLeft, topRight, bottomLeft, bottomRight, rotate, delete
